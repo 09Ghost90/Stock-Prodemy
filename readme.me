@@ -1,0 +1,36 @@
+Express: Cria um servidor para gerenciar rotas e requisições.
+
+MySQL: Permite interagir com o banco de dados MySQL, fazendo consultas e manipulando dados.
+
+Body-Parser: Faz o parsing de dados JSON enviados nas requisições HTTP.
+
+CORS: Permimte que o frontend de um domínimo diferente acesse seu backend.
+
+Path: Ajuda a trabalhar com caminhos de arquivos de maneira portátil e correta entre diferentes sistemas operacionais.
+
+Observação sobre o erro ER_NOT_SUPPORTED_AUTH_MODE:
+Esse erro ocorre devido a uma incompatibilidade entre o método de autenticação configurado no MySQL e o 
+módulo mysql usado no Node.js. O MySQL 8.0, por padrão, utiliza o protocolo caching_sha2_password, 
+que não é suportado por algumas versões do cliente MySQL. Para resolver, é possível alterar o método 
+de autenticação do usuário para mysql_native_password ou atualizar para um módulo compatível, como mysql2. 
+Essa configuração é importante para garantir a comunicação entre o servidor Node.js e o banco de dados.
+
+Correção:
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'sua_senha';
+FLUSH PRIVILEGES;
+
+Atualizar o Cliente MySQL no Node.js:
+
+npm install mysql2
+
+Alterar importações e conexões no server.js:
+
+const mysql = requite('mysql2');
+
+// Importações necessárias (Lembrar de Instalar)
+const express = require('express'); // Módulo Express cria servidores web para Node.js
+const mysql = require('mysql2');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const path = require('path');

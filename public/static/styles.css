@@ -1,0 +1,211 @@
+/* styles.css */
+
+/* Título principal */
+#title {
+    color: #333;
+    font-size: 36px;
+    font-family: 'Arial', sans-serif;
+    margin: 20px 0;
+    text-align: left; /* Alinha à esquerda */
+}
+
+/* Estilos para o corpo */
+body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: flex-start; /* Alinha os elementos à esquerda */
+    justify-content: flex-start;
+}
+
+/* Cabeçalho */
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Estilos para a área principal */
+main {
+    flex: 1;
+    width: 70%; /* Diminui a largura para uma margem melhor */
+    margin: 2em auto;
+    background-color: white;
+    padding: 2em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* Formulário */
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+input {
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 400px; /* Tamanho máximo de input */
+    font-size: 16px;
+    box-sizing: border-box; /* Para manter o padding dentro da largura */
+}
+
+/* Estilos para o botão */
+button {
+    padding: 12px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 10px;
+}
+
+button i {
+    margin-right: 8px;
+}
+
+/* Estilo do botão ao passar o mouse */
+button:hover {
+    background-color: #45a049;
+}
+
+/* Tabela */
+#tabela-estoque tbody {
+    display: block;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#tabela-estoque thead, #tabela-estoque tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Botão de exclusão */
+.btn-excluir {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.btn-excluir i {
+    font-size: 18px;
+    color: #f44336;
+    transition: transform 0.2s;
+}
+
+.btn-excluir:hover i {
+    transform: scale(1.2);
+    color: #f44336;
+}
+
+/* Barra de pesquisa */
+#search {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para a tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Rodapé */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: auto;
+    position: absolute;
+    bottom: 0;    
+}
+
+/* Media Query para dispositivos móveis */
+@media (max-width: 768px) {
+    main {
+        width: 90%;
+        padding: 1em;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    button {
+        padding: 14px; /* Ajuste para facilitar o clique em dispositivos móveis */
+    }
+
+    label, input {
+        font-size: 14px;
+    }
+
+    footer {
+        font-size: 12px;
+    }
+}
+
+/* Media Query para dispositivos móveis muito pequenos */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 18px;
+    }
+
+    button {
+        padding: 12px;
+    }
+
+    label, input {
+        font-size: 12px;
+    }
+
+    table td, table th {
+        padding: 8px;
+    }
+}
