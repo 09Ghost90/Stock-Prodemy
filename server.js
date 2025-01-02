@@ -1,3 +1,4 @@
+const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -12,6 +13,7 @@ const connection = mysql.createConnection({
     user: 'root',
     password: 'Bruno1227!',
     database: 'estoque',
+    charset: 'utf8mb4'
 });
 
 connection.connect((err) => {
@@ -22,6 +24,7 @@ connection.connect((err) => {
     console.log('Conexão com o banco de dados estabelecida!');
 });
 
+app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -31,13 +34,13 @@ app.get('/', (req, res) => {
 });
 
 app.post('/add-item', (req, res) => {
-    const { codigo, categoria, nome, quantidade, preco, unidade } = req.body;
-    if (!codigo || !categoria || !nome || !quantidade || !preco || !unidade) {
+    const { codigo, unidade, nome, preco_unid, preco, quantidade } = req.body;
+    if (!codigo || !unidade || !nome || preco_unid === undefined || !preco || quantidade === undefined) {
         return res.status(400).send('Todos os campos são obrigatórios.');
     }
 
-    const query = 'INSERT INTO produtos (codigo, categoria, nome, quantidade, preco, unidade) VALUES (?, ?, ?, ?, ?, ?)';
-    connection.query(query, [codigo, categoria, nome, quantidade, preco, unidade], (err, result) => {
+    const query = 'INSERT INTO produtos (codigo, unidade, nome, preco_unid, preco, quantidade) VALUES (?, ?, ?, ?, ?, ?)';
+    connection.query(query, [codigo, unidade, nome, preco_unid, preco, quantidade], (err, result) => {
         if (err) {
             console.error('Erro ao inserir produto:', err);
             return res.status(500).send('Erro ao inserir produto.');
@@ -63,7 +66,7 @@ app.get('/get-products', (req, res) => {
 });
 
 app.patch('/edit-product', (req, res) => {
-    const { codigo, categoria, nome, quantidade, preco, unidade } = req.body;
+    const { codigo, unidade, nome, preco_unid, preco, quantidade } = req.body;
 
     if (!codigo) {
         return res.status(400).send('Código do produto é obrigatório.');
@@ -82,25 +85,27 @@ app.patch('/edit-product', (req, res) => {
         const updatesFields = [];
         const values = [];
 
-        if (categoria) {
-            updatesFields.push('categoria = ?');
-            values.push(categoria);
-        }
         if (nome) {
             updatesFields.push('nome = ?');
             values.push(nome);
         }
-        if (quantidade) {
-            updatesFields.push('quantidade = ?');
-            values.push(quantidade);
+
+        if (unidade) {
+            updatesFields.push('unidade = ?');
+            values.push(unidade);
+        }
+        
+        if (preco_unid) {
+            updatesFields.push('preco_unid = ?');
+            values.push(preco_unid);
         }
         if (preco) {
             updatesFields.push('preco = ?');
             values.push(preco);
         }
-        if (unidade) {
-            updatesFields.push('unidade = ?');
-            values.push(unidade);
+        if (quantidade) {
+            updatesFields.push('quantidade = ?');
+            values.push(quantidade);
         }
 
         values.push(codigo);
@@ -122,6 +127,7 @@ app.patch('/edit-product', (req, res) => {
         });
     });
 });
+
 
 app.delete('/delete-product', (req, res) => {
     const { codigo } = req.query;
@@ -168,6 +174,25 @@ app.post('/add-client', (req, res) => {
         }
         console.log('Cliente adicionado com sucesso', result);
         res.status(200).send('Cliente adicionado com sucesso!');
+    });
+});
+
+app.post('/save-products', (req, res) => {
+    const data = req.body;
+
+    const directory = path.join(__dirname, 'logs');
+
+    if (!fs.existsSync(directory)){
+        fs.mkdirSync(directory);
+    }
+
+    const filePath = path.join(directory, 'data.json');
+
+    fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
+        if (err) {
+            return res.status(500).send('Erro ao salvar os arquivo.');
+        }
+        res.status(200).send('Arquivo salvo com sucesso!');
     });
 });
 
