@@ -177,6 +177,49 @@ app.post('/add-client', (req, res) => {
     });
 });
 
+app.get('/get-clients', (req, res) => {
+    const searchTerm = req.query.search || '';
+    const query = 'SELECT * FROM clientes WHERE nome LIKE ?';
+    const values = [`%${searchTerm}%`];
+
+    connection.query(query, values, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar clientes:', err);
+            return res.status(500).send('Erro ao buscar clientes.');
+        }
+        console.log('Clientes encontrados:', results);
+        res.status(200).json(results);
+    });
+});
+
+app.patch('/edit-client', (req, res) => {
+    const {nome, contato, endereco, atendimento, entrega, observacao} = req.body;
+
+    if (!nome) {
+        return res.status(400).send('Nome do cliente é obrigatório.');
+    }
+
+    const query = `
+        UPDATE clientes
+        SET contato = ?, endereco = ?, atendimento = ?, entrega = ?, observacao = ?
+        WHERE nome = ?
+    `;
+
+    connection.query(query, [contato, endereco, atendimento, entrega, observacao, nome], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar cliente:', err);
+            return res.status(500).send('Erro ao atualizar cliente.');
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Cliente não encontrado.');
+        }
+
+        console.log('Cliente atualizado com sucesso:', result);
+        res.status(200).send('Cliente atualizado com sucesso!');
+    });
+});
+
 app.post('/save-products', (req, res) => {
     const data = req.body;
 
