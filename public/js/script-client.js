@@ -15,6 +15,12 @@ document.getElementById('form-cliente').addEventListener('submit', async functio
         return;
     }
 
+    // Validação do formato:
+    const validacoes = {
+        contato: /^(\d{10,11})$/,
+        // Adicionar mais campos conforme necessário
+    }
+
     try {
         const response = await fetch('http://localhost:3000/add-client', {
             method: 'POST',
@@ -37,6 +43,14 @@ document.getElementById('form-cliente').addEventListener('submit', async functio
 
 // Função para Carregar os produtos
 async function loadClients() {
+
+    // Ainda não implementado no Backend
+    const response = await fetch(`http://localhost:3000/get-clients?page=${pagina}&limit=${itensPorPagina}`);
+    const data = await response.json();
+    const clientes = data.clientes;
+    const total = data.total;
+    const totalPaginas = Math.ceil(total / itensPorPagina);
+    
     try {
         const response = await fetch('http://localhost:3000/get-clients');
         const clients = await response.json();
@@ -195,4 +209,27 @@ async function excluirCliente(nomeCliente) {
     }
 }
 
-loadClients();
+// Feedback visual:
+function mostrarLoading() {
+    // ... 
+}
+
+// Adicioanr classes de sucesso/erro nos campos
+function marcarcampoInvalidado(campo) {
+    campo.classList.add('Campo-invalido');
+}
+
+// Adicionar função de busca
+async function buscarClientes(termo) {
+    const response = await fetch(`http://localhost:3000/get-clients?search=${encodeURIComponent(termo)}`);
+    // ... resto do código
+}
+
+// Adicionar cache local para melhorar performance
+function cacheClientes(dados) {
+    localStorage.setItem('clientes', JSON.stringify(dados));
+}
+
+window.addEventListener('online', () => {
+    loadClients(); // Recarregar dados quando voltar online
+});

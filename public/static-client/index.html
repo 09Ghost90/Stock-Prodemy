@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static-client/styles.css">
     <title>Cadastro de Clientes</title>
 </head>
 <body>
@@ -17,8 +18,10 @@
         <input type="text" id="horario-entrega" placeholder="Horário - Entrega" required><br><br>
         <input type="text" id="observacao" placeholder="Observações" required>
         <br><br>
-        <button type="submit">
-            <i class="fa fa-save"></i>Adicionar Cliente</button>
+        <div class="button-container">
+            <button type="submit">Adicionar Cliente</button>
+            <a href="../static-stock/index.html"><button type="button">Estoque</button></a>
+        </div>
     </form>
 
     <div id="modal-editar-cliente" class="modal">
@@ -39,10 +42,6 @@
             </form>
         </div>
     </div>
-
-    <a href="/static/index.html">
-        <button>Estoque</button>
-    </a>
 
     <!-- Tabela para exibir os clientes -->
      <h2>Clientes Cadastrados</h2>
