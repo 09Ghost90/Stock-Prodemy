@@ -1,3 +1,27 @@
+// Função para exibir mensagens de alerta
+function showAlert(message, isSuccess = true) {
+    alert(message);
+    if (isSuccess) {
+        document.getElementById('form-produto').reset();
+        loadProducts();
+    }
+}
+
+// Função para fazer requisições HTTP
+async function fetchData(url, options) {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+        throw error;
+    }
+}
+
 // Adicionar o evento de submit do formulário
 document.getElementById('form-produto').addEventListener('submit', async function (event) {
     event.preventDefault();
@@ -11,15 +35,15 @@ document.getElementById('form-produto').addEventListener('submit', async functio
     const quantidade = document.getElementById('quantidade').value;
 
     if (!codigo || !unidade || !nome || !preco_unid || !preco || !quantidade) {
-        alert('Preencha todos os campos.');
+        showAlert('Preencha todos os campos.', false);
         return;
     }
 
     try {
-        const response = await fetch('http://localhost:3000/add-item', {
+        await fetchData('http://localhost:3000/add-item', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json; charset=utf-8', 
+                'Content-Type': 'application/json; charset=utf-8',
             },
             body: JSON.stringify({
                 codigo: parseInt(codigo),
@@ -27,28 +51,20 @@ document.getElementById('form-produto').addEventListener('submit', async functio
                 nome,
                 preco_unid: parseFloat(preco_unid),
                 preco: parseFloat(preco),
-                quantidade: parseInt(quantidade), 
+                quantidade: parseInt(quantidade),
             }),
         });
 
-        if (response.ok) {
-            alert('Produto adicionado com sucesso!');
-            document.getElementById('form-produto').reset();
-            loadProducts();
-        } else {
-            const errorText = await response.text();
-            alert(`Erro: ${errorText}`);
-        }
+        showAlert('Produto adicionado com sucesso!');
     } catch (error) {
-        console.error('Erro ao adicionar produto:', error);
+        showAlert(`Erro: ${error.message}`, false);
     }
 });
 
 // Função para Carregar os produtos
 async function loadProducts() {
     try {
-        const response = await fetch('http://localhost:3000/get-products');
-        const products = await response.json();
+        const products = await fetchData('http://localhost:3000/get-products');
         console.log('Produtos recebidos:', products);
 
         const tableBody = document.querySelector('#tabela-estoque tbody');
@@ -85,18 +101,13 @@ async function loadProducts() {
             button.addEventListener('click', async function () {
                 const codigo = parseInt(button.getAttribute('data-codigo'));
                 try {
-                    const response = await fetch(`http://localhost:3000/delete-product?codigo=${codigo}`, {
+                    await fetchData(`http://localhost:3000/delete-product?codigo=${codigo}`, {
                         method: 'DELETE',
                     });
 
-                    if (response.ok) {
-                        alert('Produto excluído com sucesso!');
-                        loadProducts();
-                    } else {
-                        alert('Erro ao excluir o produto. Tente novamente.');
-                    }
+                    showAlert('Produto excluído com sucesso!');
                 } catch (error) {
-                    console.error('Erro ao excluir o produto:', error);
+                    showAlert('Erro ao excluir o produto. Tente novamente.', false);
                 }
             });
         });
@@ -108,7 +119,7 @@ async function loadProducts() {
                 const product = products.find(p => p.codigo === codigo);
 
                 if (!product) {
-                    alert('Produto não encontrado.');
+                    showAlert('Produto não fornecido.', false);
                     return;
                 }
 
@@ -128,50 +139,48 @@ async function loadProducts() {
     }
 }
 
+document.getElementById('form-editar-produto').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    await submitEdicaoProduto();
+})
+
+async function submitEdicaoProduto() {
+    const updateProducts = {
+        codigo: document.getElementById('codigo-editar').value,
+        unidade: document.getElementById('unidade-editar').value,
+        nome: document.getElementById('nome-editar').value,
+        preco_unid: document.getElementById('preco-editar-unidade').value,
+        preco: document.getElementById('preco-editar').value,
+        quantidade: document.getElementById('quantidade-editar').value,
+    };
+
+    try {
+        await fetchData('http://localhost:3000/edit-product', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json; charset=utf-8' },
+            body: JSON.stringify(updateProducts),
+        });
+
+        showAlert('Produto atualizado com sucesso!');
+        closeModal();
+    } catch (error) {
+        showAlert('Erro ao editar produto.', false);
+    }
+};
+
 // Fechar o modal ao clicar no botão ou fora do modal
 document.getElementById('close-modal').addEventListener('click', closeModal);
 window.addEventListener('click', function (event) {
-    const modal = this.document.getElementById('modal-editar');
+    const modal = document.getElementById('modal-editar');
     if (event.target === modal) {
         closeModal();
     }
 });
 
-// Submeter o formulário de edição
-document.getElementById('form-editar').addEventListener('submit', async function (event) {
-    event.preventDefault();  
-    
-    const updateProducts = {
-        codigo: document.getElementById('codigo-editar').value,
-        unidade: document.getElementById('unidade-editar').value,
-        categoria: document.getElementById('nome-editar').value,
-        nome: document.getElementById('preco-editar-unidade').value,
-        quantidade: document.getElementById('preco-editar').value,
-        preco: document.getElementById('quantidade-editar').value,
-    };
-
-    try {
-        const response = await fetch('http://localhost:3000/edit-product', {
-            method: 'PATCH',
-            headers: {'Content-Type': 'application/json; charset=utf-8' },
-            body: JSON.stringify(updateProducts),
-        });
-
-        if(response.ok){
-            alert('Produto atualizado com sucesso!');
-            loadProducts();
-            closeModal();
-        } else {
-            alert('Erro ao editar produto.');
-        }
-
-    } catch (error) {
-        console.error('Erro ao editar produto:', error);
-    }
-});
-
 function closeModal() {
     document.getElementById('modal-editar').style.display = 'none';
+    // Limpar os campos do formulário de edição
+    document.getElementById('form-editar-produto').reset();
 }
 
 loadProducts();

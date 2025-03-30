@@ -35,6 +35,7 @@ document.getElementById('form-cliente').addEventListener('submit', async functio
     }
 });
 
+// Função para Carregar os produtos
 async function loadClients() {
     try {
         const response = await fetch('http://localhost:3000/get-clients');
@@ -120,6 +121,78 @@ document.getElementById('close-modal-editar').addEventListener('click', function
 
 function abrirModalEdicao() {
     document.getElementById('modal-editar-cliente').style.display = 'block';
+}
+
+// Event listener para o formulário de edição de cliente
+document.getElementById('form-editar-cliente').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    await submitEdicaoCliente();
+});
+
+/**
+ * Função para enviar os dados atualizados do cliente para o servidor
+ * Coleta os dados do formulário de edição e envia uma requisição PATCH
+ */
+async function submitEdicaoCliente() {
+    const clienteAtualizado = {
+        nome: document.getElementById('nome-editar').value,
+        contato: document.getElementById('contato-editar').value,
+        endereco: document.getElementById('endereco-editar').value,
+        atendimento: document.getElementById('horario-atendimento-editar').value,
+        entrega: document.getElementById('horario-entrega-editar').value,
+        observacao: document.getElementById('observacao-editar').value
+    };
+
+    // Validação dos campos obrigatórios
+    if (!clienteAtualizado.nome || !clienteAtualizado.contato || !clienteAtualizado.endereco || 
+        !clienteAtualizado.atendimento || !clienteAtualizado.entrega) {
+        alert('Preencha todos os campos obrigatórios.');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/edit-client', {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(clienteAtualizado)
+        });
+
+        if (response.ok) {
+            alert('Cliente atualizado com sucesso!');
+            document.getElementById('modal-editar-cliente').style.display = 'none';
+            loadClients(); // Recarrega a lista de clientes
+        } else {
+            const errorText = await response.text();
+            alert(`Erro ao atualizar cliente: ${errorText}`);
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar cliente:', error);
+        alert('Ocorreu um erro ao tentar atualizar o cliente. Verifique o console para mais detalhes.');
+    }
+}
+
+async function excluirCliente(nomeCliente) {
+    if (!confirm(`Tem certeza que deseja excluir o cliente "${nomeCliente}"?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/delete-client?nome=${encodeURIComponent(nomeCliente)}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('Cliente excluído com sucesso!');
+            loadClients(); // Recarrega a lista de clientes
+        } else {
+            const errorText = await response.text();
+            alert(`Erro ao excluir cliente: ${errorText}`);
+            console.log('Erro no Client.js');
+        }
+    } catch (error) {
+        console.error('Erro ao excluir cliente:', error);
+        alert('Ocorreu um erro ao tentar excluir o cliente. Verifique o console para mais detalhes.');
+    }
 }
 
 loadClients();
